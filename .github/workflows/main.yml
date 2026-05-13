@@ -97,13 +97,19 @@ jobs:
       #    main.py and buildozer.spec are in the repo root (working-dir .)
       #    ANDROID_HOME points to the SDK that Buildozer downloads there.
       # ------------------------------------------------------------------
-          
       - name: Build debug APK
         run: |
+          # 1. تهيئة المجلدات
           mkdir -p ~/.android && touch ~/.android/repositories.cfg
-          # حذفنا أمر clean لأننا بدأنا من صفر حقيقي
+          
+          # 2. تحميل وتثبيت نسخة 33.0.0 يدوياً ومنع النظام من طلب غيرها
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "build-tools;33.0.0" "platforms;android-33"
+          
+          # 3. تشغيل البناء مع إجبار استخدام الأدوات المثبتة
+          export BUILDOZER_ALLOW_ORG_APK_NAME=1
           buildozer -v android debug 2>&1 | tee buildozer_build.log
-
+    
+      
 
 
       
