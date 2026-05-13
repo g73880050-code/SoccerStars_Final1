@@ -97,11 +97,13 @@ jobs:
       #    main.py and buildozer.spec are in the repo root (working-dir .)
       #    ANDROID_HOME points to the SDK that Buildozer downloads there.
       # ------------------------------------------------------------------
+          
       - name: Build debug APK
         run: |
           mkdir -p ~/.android && touch ~/.android/repositories.cfg
-          buildozer android clean
+          # حذفنا أمر clean لأننا بدأنا من صفر حقيقي
           buildozer -v android debug 2>&1 | tee buildozer_build.log
+
 
 
       
