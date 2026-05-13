@@ -99,10 +99,10 @@ jobs:
       # ------------------------------------------------------------------
       - name: Build debug APK
         working-directory: .
-        env:
-          ANDROID_HOME: ${{ github.workspace }}/.buildozer/android/platform/android-sdk
         run: |
+          yes | sdkmanager --licenses || true
           buildozer -v android debug 2>&1 | tee buildozer_build.log
+ 
 
       # ------------------------------------------------------------------
       # 8. Upload APK artifact
