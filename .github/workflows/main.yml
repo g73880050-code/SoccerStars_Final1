@@ -99,17 +99,17 @@ jobs:
       # ------------------------------------------------------------------
       - name: Build debug APK
         run: |
-          # 1. تهيئة ملفات الأندرويد
+          # 1. تهيئة المجلدات
           mkdir -p ~/.android && touch ~/.android/repositories.cfg
           
-          # 2. الموافقة على الرخص
+          # 2. الموافقة على رخص الأندرويد
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
           
-          # 3. تثبيت النسخة 33 فقط (لحذف أي تضارب)
-          echo "Installing tools and aidl for version 33..."
+          # 3. تثبيت نسخة 33 فقط (التي يدعمها كودك) ومعها الـ Platform-Tools التي تحتوي على Aidl
+          echo "Installing Android Build Tools 33..."
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "build-tools;33.0.0" "platforms;android-33" "platform-tools"
           
-          # 4. إضافة مسار النسخة 33 حصراً للـ PATH
+          # 4. توجيه النظام لاستخدام نسخة 33 حصراً
           export PATH=$ANDROID_HOME/build-tools/33.0.0:$ANDROID_HOME/platform-tools:$PATH
           
           # 5. تشغيل البناء
