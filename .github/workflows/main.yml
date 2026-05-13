@@ -98,11 +98,10 @@ jobs:
       #    ANDROID_HOME points to the SDK that Buildozer downloads there.
       # ------------------------------------------------------------------
       - name: Build debug APK
-        working-directory: .
         run: |
-          yes | sdkmanager --licenses || true
+          yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses || true
           buildozer -v android debug 2>&1 | tee buildozer_build.log
- 
+
 
       # ------------------------------------------------------------------
       # 8. Upload APK artifact
