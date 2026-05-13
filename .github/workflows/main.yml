@@ -99,8 +99,11 @@ jobs:
       # ------------------------------------------------------------------
       - name: Build debug APK
         run: |
-          yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses || true
+          yes | buildozer android signatures || true
           buildozer -v android debug 2>&1 | tee buildozer_build.log
+
+      
+
 
 
       # ------------------------------------------------------------------
