@@ -73,7 +73,7 @@ jobs:
         run: |
           pip install --upgrade pip wheel setuptools
           pip install "cython==3.0.10"
-          pip install "buildozer>=1.5.0"
+          pip install "buildozer==1.5.0"
 
       # ------------------------------------------------------------------
       # 6. Cache Buildozer downloads
