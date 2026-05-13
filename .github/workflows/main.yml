@@ -99,18 +99,14 @@ jobs:
       # ------------------------------------------------------------------
       - name: Build debug APK
         run: |
-          # 1. تنظيف أي مخلفات قديمة في المجلدات المخفية
-          rm -rf .buildozer/android/platform/python-for-android
+          # 1. تنظيف خفيف (بدون تدمير المسارات)
+          mkdir -p ~/.android && touch ~/.android/repositories.cfg
           
-          # 2. حذف النسخة 37 من جذور السيرفر
-          sudo $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --uninstall "build-tools;37.0.0" || true
-          
-          # 3. تثبيت النسخة 33 والموافقة على الرخص بصرامة
+          # 2. الموافقة على الرخص (هذه أهم خطوة)
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "build-tools;33.0.0" "platforms;android-33" "platform-tools"
           
-          # 4. تشغيل البناء مع "تنظيف" داخلي لبولديزور
-          buildozer android clean
+          # 3. دع بولديزور يبني ويبحث عن الأدوات بنفسه
+          # هو مبرمج ليبحث عن 33 إذا لم يجدها
           buildozer -v android debug 2>&1 | tee buildozer_build.log
 
 
