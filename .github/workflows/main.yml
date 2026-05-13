@@ -99,15 +99,14 @@ jobs:
       # ------------------------------------------------------------------
       - name: Build debug APK
         run: |
-          # 1. تهيئة ملفات الأندرويد
+          # 1. تهيئة المجلدات
           mkdir -p ~/.android && touch ~/.android/repositories.cfg
           
-          # 2. حذف أي أدوات بناء قديمة موجودة وتثبيت النسخة 33 فقط
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --uninstall "build-tools;37.0.0" || true
-          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "build-tools;33.0.0" "platforms;android-33" "platform-tools"
+          # 2. الموافقة على رخص النسخة 37 والنسخة 33 وكل شيء
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
           
-          # 3. تعديل المسار لإجبار النظام على استخدام الأدوات المثبتة يدوياً
-          export PATH=$ANDROID_HOME/build-tools/33.0.0:$PATH
+          # 3. تثبيت الأدوات التي يطلبها السيرفر "عناداً" لكي لا يفشل
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "build-tools;37.0.0" "platform-tools" "platforms;android-34"
           
           # 4. تشغيل البناء
           buildozer -v android debug 2>&1 | tee buildozer_build.log
