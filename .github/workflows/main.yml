@@ -99,16 +99,20 @@ jobs:
       # ------------------------------------------------------------------
       - name: Build debug APK
         run: |
-          # 1. تهيئة المجلدات
+          # 1. تهيئة ملفات الأندرويد
           mkdir -p ~/.android && touch ~/.android/repositories.cfg
           
-          # 2. الموافقة على رخص النسخة 37 والنسخة 33 وكل شيء
+          # 2. الموافقة على كل الرخص فوراً
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
           
-          # 3. تثبيت الأدوات التي يطلبها السيرفر "عناداً" لكي لا يفشل
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "build-tools;37.0.0" "platform-tools" "platforms;android-34"
+          # 3. تثبيت أداة aidl والنسخة 33 و 37 لقطع الشك باليقين
+          echo "Installing tools and aidl..."
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "build-tools;33.0.0" "build-tools;37.0.0" "platform-tools" "platforms;android-33"
           
-          # 4. تشغيل البناء
+          # 4. إضافة المسار الذي توجد فيه aidl للنظام لكي يراها Buildozer
+          export PATH=$ANDROID_HOME/build-tools/33.0.0:$ANDROID_HOME/build-tools/37.0.0:$ANDROID_HOME/platform-tools:$PATH
+          
+          # 5. تشغيل البناء
           buildozer -v android debug 2>&1 | tee buildozer_build.log
 
       
