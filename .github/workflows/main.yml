@@ -99,20 +99,21 @@ jobs:
       # ------------------------------------------------------------------
       - name: Build debug APK
         run: |
-          # 1. تهيئة المجلدات
+          # 1. تهيئة
           mkdir -p ~/.android && touch ~/.android/repositories.cfg
           
-          # 2. الموافقة على رخص الأندرويد
+          # 2. الموافقة على الرخص وحذف أي أثر للنسخة 37 اللعينة
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --uninstall "build-tools;37.0.0" || true
           
-          # 3. تثبيت نسخة 33 فقط (التي يدعمها كودك) ومعها الـ Platform-Tools التي تحتوي على Aidl
-          echo "Installing Android Build Tools 33..."
+          # 3. تثبيت النسخة 33 حصراً مع الأدوات المطلوبة
+          echo "Installing only version 33..."
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "build-tools;33.0.0" "platforms;android-33" "platform-tools"
           
-          # 4. توجيه النظام لاستخدام نسخة 33 حصراً
+          # 4. إجبار النظام على رؤية 33 فقط
           export PATH=$ANDROID_HOME/build-tools/33.0.0:$ANDROID_HOME/platform-tools:$PATH
           
-          # 5. تشغيل البناء
+          # 5. تشغيل البناء مع أمر إضافي لمنع التحديث التلقائي
           buildozer -v android debug 2>&1 | tee buildozer_build.log
 
       
