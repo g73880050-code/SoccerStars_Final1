@@ -99,9 +99,7 @@ jobs:
       # ------------------------------------------------------------------
       - name: Build debug APK
         run: |
-          sudo apt-get install -y adb
-          export ANT_HOME=/usr/share/ant
-          export PATH=$PATH:$ANT_HOME/bin
+          mkdir -p ~/.android && touch ~/.android/repositories.cfg
           buildozer -v android debug 2>&1 | tee buildozer_build.log
 
 
