@@ -79,10 +79,12 @@ requirements = python3==3.11.9,kivy==2.3.0,numpy,opencv,pyjnius,android
 # ----------------------------------------------------------------------------
 # Android SDK / NDK
 # ----------------------------------------------------------------------------
-android.api     = 34
-android.minapi  = 26          # Android 8.0 — minimum for TYPE_APPLICATION_OVERLAY
+android.api = 33
+android.build_tools_version = 33.0.0
+android.minapi = 21
 android.ndk_api = 26
-android.archs   = arm64-v8a   # Honor 400 is arm64; add armeabi-v7a for older devices
+android.archs = arm64-v8a
+   # Honor 400 is arm64; add armeabi-v7a for older devices
 
 # Gradle / AndroidX
 android.gradle_dependencies = androidx.core:core:1.13.1
