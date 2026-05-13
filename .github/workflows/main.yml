@@ -1,0 +1,131 @@
+name: Build Soccer Stars Analyzer APK
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ------------------------------------------------------------------
+      # 1. Checkout
+      # ------------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ------------------------------------------------------------------
+      # 2. Python runtime
+      # ------------------------------------------------------------------
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      # ------------------------------------------------------------------
+      # 3. System dependencies
+      #
+      #    libtinfo5 is no longer available on ubuntu-24.04 (ubuntu-latest
+      #    as of 2025+). libncurses6 / libncursesw6 are the current
+      #    equivalents. No third-party apt sources are required.
+      # ------------------------------------------------------------------
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            git \
+            zip \
+            unzip \
+            openjdk-17-jdk \
+            autoconf \
+            automake \
+            libtool \
+            pkg-config \
+            zlib1g-dev \
+            libncurses6 \
+            libncursesw6 \
+            libssl-dev \
+            libffi-dev \
+            libsqlite3-dev \
+            libgdbm-dev \
+            build-essential \
+            ccache \
+            cmake \
+            ninja-build \
+            gettext
+
+      # ------------------------------------------------------------------
+      # 4. Java home (required by Buildozer / Gradle)
+      # ------------------------------------------------------------------
+      - name: Set JAVA_HOME
+        run: |
+          echo "JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))" >> "$GITHUB_ENV"
+
+      # ------------------------------------------------------------------
+      # 5. Python build tools + Buildozer  (direct pip — no third-party action)
+      # ------------------------------------------------------------------
+      - name: Install Buildozer and Python dependencies
+        run: |
+          pip install --upgrade pip wheel setuptools
+          pip install "cython==3.0.10"
+          pip install "buildozer>=1.5.0"
+
+      # ------------------------------------------------------------------
+      # 6. Cache Buildozer downloads
+      #
+      #    Files are in the repo root — .buildozer/ lives at ./
+      #    Cache key changes when buildozer.spec changes.
+      # ------------------------------------------------------------------
+      - name: Cache Buildozer global directory
+        uses: actions/cache@v4
+        with:
+          path: |
+            .buildozer/android/platform
+            .buildozer/android/app
+          key: buildozer-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
+          restore-keys: |
+            buildozer-${{ runner.os }}-
+
+      # ------------------------------------------------------------------
+      # 7. Build the APK
+      #
+      #    main.py and buildozer.spec are in the repo root (working-dir .)
+      #    ANDROID_HOME points to the SDK that Buildozer downloads there.
+      # ------------------------------------------------------------------
+      - name: Build debug APK
+        working-directory: .
+        env:
+          ANDROID_HOME: ${{ github.workspace }}/.buildozer/android/platform/android-sdk
+        run: |
+          buildozer -v android debug 2>&1 | tee buildozer_build.log
+
+      # ------------------------------------------------------------------
+      # 8. Upload APK artifact
+      #    APK lands in ./bin/ (relative to repo root)
+      # ------------------------------------------------------------------
+      - name: Upload APK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: soccer-stars-analyzer-debug-apk
+          path: ./bin/*.apk
+          retention-days: 30
+          if-no-files-found: error
+
+      # ------------------------------------------------------------------
+      # 9. Upload build log on failure
+      # ------------------------------------------------------------------
+      - name: Upload build log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: buildozer-failure-log
+          path: ./buildozer_build.log
+          retention-days: 7
+          if-no-files-found: ignore
+
