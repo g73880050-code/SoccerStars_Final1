@@ -102,15 +102,15 @@ jobs:
           # 1. تهيئة ملفات الأندرويد
           mkdir -p ~/.android && touch ~/.android/repositories.cfg
           
-          # 2. الموافقة على كل الرخص فوراً
+          # 2. الموافقة على الرخص
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
           
-          # 3. تثبيت أداة aidl والنسخة 33 و 37 لقطع الشك باليقين
-          echo "Installing tools and aidl..."
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "build-tools;33.0.0" "build-tools;37.0.0" "platform-tools" "platforms;android-33"
+          # 3. تثبيت النسخة 33 فقط (لحذف أي تضارب)
+          echo "Installing tools and aidl for version 33..."
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "build-tools;33.0.0" "platforms;android-33" "platform-tools"
           
-          # 4. إضافة المسار الذي توجد فيه aidl للنظام لكي يراها Buildozer
-          export PATH=$ANDROID_HOME/build-tools/33.0.0:$ANDROID_HOME/build-tools/37.0.0:$ANDROID_HOME/platform-tools:$PATH
+          # 4. إضافة مسار النسخة 33 حصراً للـ PATH
+          export PATH=$ANDROID_HOME/build-tools/33.0.0:$ANDROID_HOME/platform-tools:$PATH
           
           # 5. تشغيل البناء
           buildozer -v android debug 2>&1 | tee buildozer_build.log
