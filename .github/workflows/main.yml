@@ -100,6 +100,7 @@ jobs:
       - name: Build debug APK
         run: |
           mkdir -p ~/.android && touch ~/.android/repositories.cfg
+          buildozer android clean
           buildozer -v android debug 2>&1 | tee buildozer_build.log
 
 
