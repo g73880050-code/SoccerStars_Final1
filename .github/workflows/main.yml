@@ -99,22 +99,20 @@ jobs:
       # ------------------------------------------------------------------
       - name: Build debug APK
         run: |
-          # 1. تهيئة
-          mkdir -p ~/.android && touch ~/.android/repositories.cfg
+          # 1. تنظيف أي مخلفات قديمة في المجلدات المخفية
+          rm -rf .buildozer/android/platform/python-for-android
           
-          # 2. الموافقة على الرخص وحذف أي أثر للنسخة 37 اللعينة
+          # 2. حذف النسخة 37 من جذور السيرفر
+          sudo $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --uninstall "build-tools;37.0.0" || true
+          
+          # 3. تثبيت النسخة 33 والموافقة على الرخص بصرامة
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --uninstall "build-tools;37.0.0" || true
-          
-          # 3. تثبيت النسخة 33 حصراً مع الأدوات المطلوبة
-          echo "Installing only version 33..."
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "build-tools;33.0.0" "platforms;android-33" "platform-tools"
           
-          # 4. إجبار النظام على رؤية 33 فقط
-          export PATH=$ANDROID_HOME/build-tools/33.0.0:$ANDROID_HOME/platform-tools:$PATH
-          
-          # 5. تشغيل البناء مع أمر إضافي لمنع التحديث التلقائي
+          # 4. تشغيل البناء مع "تنظيف" داخلي لبولديزور
+          buildozer android clean
           buildozer -v android debug 2>&1 | tee buildozer_build.log
+
 
       
 
